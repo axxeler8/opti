@@ -6,30 +6,27 @@ import time
 # ===========================================================================
 
 def leer_instancia(archivo):
-    """Lee una instancia del MKP desde un archivo de texto."""
     with open(archivo, 'r') as f:
-        lineas = []
+        numeros = []
         for linea in f:
             linea = linea.strip()
             if linea and not linea.startswith('#'):
-                lineas.append(linea)
+                numeros.extend(linea.split())
     
-    idx = 0
-    valores = lineas[idx].split()
-    n = int(valores[0])
-    m = int(valores[1])
-    idx += 1
+    numeros = list(map(int, numeros))
+    pos = 0
     
-    beneficios = list(map(int, lineas[idx].split()))
-    idx += 1
+    n = numeros[pos]; pos += 1
+    m = numeros[pos]; pos += 1
+    
+    beneficios = numeros[pos:pos + n]; pos += n
     
     restricciones = []
     for i in range(m):
-        fila = list(map(int, lineas[idx].split()))
+        fila = numeros[pos:pos + n]; pos += n
         restricciones.append(fila)
-        idx += 1
     
-    capacidades = list(map(int, lineas[idx].split()))
+    capacidades = numeros[pos:pos + m]
     
     instancia = {
         'n': n,
@@ -42,7 +39,6 @@ def leer_instancia(archivo):
     return instancia
 
 def mostrar_instancia(instancia):
-    """Muestra la información de la instancia."""
     n = instancia['n']
     m = instancia['m']
     print("\n" + "=" * 50)
@@ -68,7 +64,6 @@ def mostrar_instancia(instancia):
 # ===========================================================================
 
 def leer_solucion(archivo, n):
-    """Lee una solución (vector binario) desde archivo."""
     with open(archivo, 'r') as f:
         lineas = []
         for linea in f:
@@ -82,7 +77,6 @@ def leer_solucion(archivo, n):
     return solucion
 
 def verificar_restricciones(solucion, instancia):
-    """Verifica si una solución cumple todas las capacidades."""
     n = instancia['n']
     m = instancia['m']
     es_valida = True
@@ -101,7 +95,6 @@ def verificar_restricciones(solucion, instancia):
     return es_valida, detalles
 
 def imprimir_verificacion(solucion, instancia):
-    """Imprime el resultado de la verificación."""
     es_valida, detalles = verificar_restricciones(solucion, instancia)
     print("\n  Solución:", solucion)
     print("\n  Verificación de restricciones:")
@@ -116,14 +109,9 @@ def imprimir_verificacion(solucion, instancia):
 # ===========================================================================
 
 def calcular_funcion_objetivo(solucion, instancia):
-    """Calcula el beneficio total de una solución."""
     return sum(instancia['beneficios'][j] * solucion[j] for j in range(instancia['n']))
 
 def comparar_soluciones(sol1, sol2, instancia):
-    """Compara dos soluciones considerando validez y función objetivo.
-    Regla: una solución válida siempre es mejor que una inválida.
-    Entre dos válidas, gana la de mayor F.O.
-    Entre dos inválidas, ninguna es mejor."""
     valida1, _ = verificar_restricciones(sol1, instancia)
     valida2, _ = verificar_restricciones(sol2, instancia)
     fo1 = calcular_funcion_objetivo(sol1, instancia)
@@ -153,8 +141,7 @@ def comparar_soluciones(sol1, sol2, instancia):
         print("  Resultado: Ambas soluciones son INVÁLIDAS, no se puede determinar")
     print("=" * 50)
 
-def generar_solucion_desde_entero(numero, n):
-    """Convierte un número a su representación en vector binario."""
+def generar_solucion_desde_entero(numero, n):  
     return [(numero >> j) & 1 for j in range(n - 1, -1, -1)]
 
 
@@ -163,7 +150,6 @@ def generar_solucion_desde_entero(numero, n):
 # ===========================================================================
 
 def busqueda_exhaustiva(instancia):
-    """Algoritmo de fuerza bruta para evaluar todo el espacio de soluciones."""
     n = instancia['n']
     total_soluciones = 2 ** n
     print(f"\nEjecutando fuerza bruta para {n} items ({total_soluciones} posibles)...")
@@ -209,7 +195,12 @@ if __name__ == "__main__":
     print("=== MKP SOLVER ===")
     print("-" * 50)
     
-    archivo_instancia = input("Ingrese la ruta del archivo de instancia (ej. instancias/mkp_small.txt): ").strip()
+    # --- Rutas de archivos ---
+    archivo_instancia = "instancias/mkp_instance.txt"
+    archivo_solucion1 = "instancias/solucion_ejemplo.txt"
+    archivo_solucion2 = "instancias/solucion_ejemplo2.txt"
+    
+    # --- Lectura de instancia ---
     try:
         instancia = leer_instancia(archivo_instancia)
         mostrar_instancia(instancia)
@@ -218,7 +209,6 @@ if __name__ == "__main__":
         sys.exit(1)
         
     # --- Lectura y verificación de solución 1 ---
-    archivo_solucion1 = input("\nIngrese la ruta de la solución 1 (ej. instancias/solucion_ejemplo.txt): ").strip()
     try:
         solucion1 = leer_solucion(archivo_solucion1, instancia['n'])
         imprimir_verificacion(solucion1, instancia)
@@ -229,7 +219,6 @@ if __name__ == "__main__":
         solucion1 = None
     
     # --- Lectura y verificación de solución 2 ---
-    archivo_solucion2 = input("\nIngrese la ruta de la solución 2 (ej. instancias/solucion_ejemplo2.txt): ").strip()
     try:
         solucion2 = leer_solucion(archivo_solucion2, instancia['n'])
         imprimir_verificacion(solucion2, instancia)
@@ -246,3 +235,4 @@ if __name__ == "__main__":
     # --- Búsqueda exhaustiva ---
     print("\nIniciando algoritmo de Fuerza Bruta...")
     busqueda_exhaustiva(instancia)
+
