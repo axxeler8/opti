@@ -16,7 +16,7 @@ def leer_instancia(archivo):
             for p in partes:
                 numeros.append(int(p))
     f.close()
-
+    
     pos = 0
     n = numeros[pos]
     pos += 1
@@ -27,7 +27,7 @@ def leer_instancia(archivo):
     for i in range(n):
         beneficios.append(numeros[pos])
         pos += 1
-
+  
     restricciones = []
     for i in range(m):
         fila = []
@@ -35,12 +35,12 @@ def leer_instancia(archivo):
             fila.append(numeros[pos])
             pos += 1
         restricciones.append(fila)
-
+  
     capacidades = []
     for i in range(m):
         capacidades.append(numeros[pos])
         pos += 1
-
+   
     instancia = {
         'n': n,
         'm': m,
@@ -83,12 +83,12 @@ def leer_solucion(archivo, n):
         if linea != "" and not linea.startswith('#'):
             lineas.append(linea)
     f.close()
-
+  
     partes = lineas[0].split()
     solucion = []
     for p in partes:
         solucion.append(int(p))
-
+    
     if len(solucion) != n:
         print("Error: La solución no tiene", n, "elementos.")
         sys.exit(1)
@@ -116,11 +116,13 @@ def imprimir_verificacion(solucion, instancia):
     print("\n  Verificación de restricciones:")
 
     es_valida = True
+   
     for i in range(m):
         consumo = 0
         for j in range(n):
             consumo += instancia['restricciones'][i][j] * solucion[j]
         capacidad = instancia['capacidades'][i]
+     
         if consumo <= capacidad:
             estado = "Cumple"
         else:
@@ -183,8 +185,7 @@ def comparar_soluciones(sol1, sol2, instancia):
 
 def busqueda_exhaustiva(instancia):
     n = instancia['n']
-    total_soluciones = 2 ** n
-    print("\nEjecutando fuerza bruta para " + str(n) + " items (" + str(total_soluciones) + " posibles)...")
+    print("\nEjecutando fuerza bruta para " + str(n) + " items...")
 
     mejor_solucion = None
     mejor_valor = -1
